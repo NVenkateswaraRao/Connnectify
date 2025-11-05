@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+   
+    "module": "nodenext",
+    "target": "esnext",
+    "types": [],
+
+    "paths": {
+      "@/prisma/*": ["./src/generated/*"],
+      "@/*": ["./*"],
+    },
+
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    "strict": true,
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+  }
+}
