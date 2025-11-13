@@ -4,38 +4,37 @@ import { authMiddleware, type AuthenticatedRequest } from "@/utils/authMiddlewar
 
 export const communityRouter = express.Router();
 
+//get all joined communities for a user
+communityRouter.get("/user/communities", authMiddleware, async (req: AuthenticatedRequest, res: Response) => {
+    console.log("Fetching communities for user:", req.user);
+    const userId = req.user?.userId;
 
-communityRouter.get("/:universityId/communities", async (req: Request, res: Response) => {
-    const { universityId } = req.params;
-
-    if (!universityId) {
-        return res.status(400).json({ message: "University ID is required" });
+    if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
     }
 
-    try {
-        // Fetch all communities for the given university ID
-        const communities = await prisma.community.findMany({
-            where: { universityId },
-            include: {
-                university: {
-                    select: { id: true, name: true, emailDomain: true, logoImageUrl: true },
-                },
-            },
-            orderBy: { name: "asc" }, // optional: sort alphabetically
-        });
-
-        if (!communities || communities.length === 0) {
-            return res.status(404).json({ message: "No communities found for this university" });
+    const communities = await prisma.community.findMany({
+        where: {
+            members: {
+                some: {
+                    userId: userId
+                }
+            }
+        },
+        include: {
+            _count: {
+                select: {
+                    members: true
+                }
+            }
         }
+    });
 
-        res.status(200).json({ communities });
-    } catch (error) {
-        console.error("Error fetching communities:", error);
-        res.status(500).json({ error: "Failed to fetch communities" });
-    }
+    res.status(200).json({ communities });
 });
 
 
+//join a community for a user
 communityRouter.post(
     "/:communityId/join",
     authMiddleware,
@@ -94,8 +93,9 @@ communityRouter.post(
     }
 );
 
+//leave a community for a user
 communityRouter.delete(
-    "/api/communities/:communityId/leave",
+    "/:communityId/leave",
     authMiddleware,
     async (req: AuthenticatedRequest, res: Response) => {
         const { communityId } = req.params;

@@ -4,9 +4,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-/**
- * Extend Express Request with user field
- */
 export interface AuthenticatedRequest extends Request {
     user?: {
         userId: string;
@@ -14,19 +11,15 @@ export interface AuthenticatedRequest extends Request {
     };
 }
 
-/**
- * Authentication Middleware
- * - Reads JWT token from cookie `session`
- * - Verifies the token using `JWT_SECRET`
- * - Attaches decoded user info to `req.user`
- */
 export const authMiddleware = (
     req: AuthenticatedRequest,
     res: Response,
     next: NextFunction
 ): void => {
     try {
+        console.log("Auth middleware: accessing cookies:", req.cookies);
         const token = req.cookies?.session;
+        console.log("Auth middleware: token from cookie:", token);
 
         if (!token) {
             console.warn("Auth middleware: missing JWT cookie.");
