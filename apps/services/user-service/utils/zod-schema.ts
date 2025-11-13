@@ -17,5 +17,5 @@ export const RegisterSchema = zod.object({
 export const LoginSchema = zod.object({
     email: zod.email("Invalid email address"),
     password: zod.string().min(6, "Password must be at least 6 characters long").max(8, "Password must be at most 8 characters long"),
-    isEmailVerified: zod.boolean("Email is not verified"),
+    isEmailVerified: zod.boolean("Email is not verified").optional(),
 });
