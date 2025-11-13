@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum PostType {
+  TEXT
+  IMAGE
+  POLL
+}
+
+
+model post {
+  id       String   @id @default(cuid())
+  type     PostType
+  content  String? 
+  imageUrl String? 
+
+
+  authorId    String  
+  communityId String?  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  comments    comment[]
+  votes       vote[]
+  pollOptions pollOption[]
+  pollVotes   pollVote[]
+}
+
+
+model pollOption {
+  id   String @id @default(cuid())
+  text String
+
+  post   post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String 
+
+  votes pollVote[]
+}
+
+
+model pollVote {
+  userId String  
+
+  post   post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String  
+
+  pollOption   pollOption @relation(fields: [pollOptionId], references: [id], onDelete: Cascade)
+  pollOptionId String      
+
+  createdAt DateTime @default(now())
+
+  @@id([userId, postId])
+}
+
+model comment {
+  id   String @id @default(cuid())
+  text String
+
+  
+  authorId String  
+
+  post   post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String  
+
+  parentId String?    
+  parent   comment?  @relation("Replies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies  comment[] @relation("Replies")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  votes vote[]
+}
+
+model vote {
+  id     String   @id @default(cuid())
+  upvote Int      @default(0)  
+
+  userId String 
+
+  postId String?
+  post   post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  commentId String?   
+  comment   comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@unique([userId, commentId])
+}
