@@ -46,5 +46,14 @@ export async function registerAction(formData: FormData) {
         domain: "localhost",
     });
 
+    (await cookies()).set("uid", data.uid, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: data.maxAge / 1000, // maxAge is in seconds for cookies()
+        path: "/",
+        domain: "localhost",
+    });
+
     redirect("/verify");
 }
