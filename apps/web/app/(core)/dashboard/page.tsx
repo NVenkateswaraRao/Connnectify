@@ -35,6 +35,6 @@ export default async function DashboardPage() {
 
   const posts = await getAllPosts();
   return (
-    <ConnectifyDashboard initialCommunities={communities} />
+    <ConnectifyDashboard initialCommunities={communities} posts={Array.isArray(posts) ? posts : []} />
   );
 }
